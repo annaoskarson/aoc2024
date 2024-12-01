@@ -1,7 +1,6 @@
-data = [(r.strip()).split(' ') for r in open('01.txt')]
+data = [map(int, (r.strip()).split()) for r in open('01.txt')]
 
-left = [int(d[0]) for d in data]
-right = [int(d[-1]) for d in data]
+left, right = map(list, zip(*data))
 
 # distance
 distance = sum([abs(l-r) for (l,r) in zip(sorted(left),sorted(right))])
