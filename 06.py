@@ -1,35 +1,41 @@
-import time
-data = [r.strip() for r in (open('06.txt')).read().split('\n') if len(r) > 0 ]
-
 class Bot():
-    def __init__(self, themap):
-        self.obstacles = set()
-        self.seen = set()
-        self.mapborders = (range(len(themap)), range(len(themap[0])))
-        for r, row in enumerate(themap):
-            for c,ch in enumerate(row):
-                if ch == '^':
-                    self.position = (r,c)
-                    self.direction = 0 #(-1,0)
-                    self.seen.add(((r,c), self.direction))
-                elif ch == '#':
-                    self.obstacles.add((r,c))
+    def __init__(self, borders, obstacles, start, direction):
+        self.mapborders = borders
+        self.obstacles = obstacles
+        self.start = start
+        self.direction = direction
+        self.seen = {start}
+        self.position = start
 
-    def step(self):
+    def onestep(self, obs):
         dirs = [(-1,0), (0,1), (1,0), (0,-1)]
-        npos = (self.position[0] + dirs[self.direction][0], self.position[1] + dirs[self.direction][1])
-        if npos in self.obstacles:
+        npos = tuple(map(sum, zip(self.position, dirs[self.direction])))
+        if npos in self.obstacles or (npos and npos == obs): # Turn right
             self.direction = (self.direction + 1) % 4 #0,1  1,0  0,-1 -1,0
-        elif npos[0] not in self.mapborders[0] or npos[1] not in self.mapborders[1]:
-            return(len(set([p[0] for p in self.seen])))
-        elif (npos, self.direction) in self.seen:
-            return(-1)
-        else:
+            return(False, False)
+        elif npos[0] not in self.mapborders[0] or npos[1] not in self.mapborders[1]: # outside map
+            return(False, True) # loop, out
+        elif (npos, self.direction) in self.seen: # Loop found!
+            return(True, False) # loop, out
+        else: # Just walk
             self.position = npos
             self.seen.add((npos, self.direction))
+            return(False, False)
 
-    def placething(self, place):
-        self.obstacles.add(place)
+    def walk(self, trypos = None):
+        loop, out = False, False
+        while not(out or loop):
+            loop, out = self.onestep(trypos) # -1 if a loop
+        return(loop, out)
+
+    def whatseen(self):
+        return(self.seen)
+
+    def startpoint(self):
+        return(self.start)
+
+    def thepath(self):
+        return(set([p[0] for p in self.seen]))
 
     def __str__(self):
         pprint = ''
@@ -48,31 +54,35 @@ class Bot():
             pprint += row
         return(pprint)
 
-def walkthewalk(data, trypos = (-1,-1)):
-    guard = Bot(data)
-    if trypos != (-1,-1):
-        guard.placething(trypos)
-    finished = False
-    show = False # Turn on to show the walking process.
-    while not finished:
-        finished = guard.step()
-        if show:
-            time.sleep(0.03)
-            print(guard)
-    return(finished)
+# Prepare the data
+data = [r.strip() for r in (open('06.txt')).read().split('\n') if len(r) > 0 ]
 
-# Part 1
-print(walkthewalk(data))
+obstacles = set()
+borders = (range(len(data)), range(len(data[0])))
+for r, row in enumerate(data):
+    for c,ch in enumerate(row):
+        if ch == '^':
+            start = (r,c)
+            direction = 0 #(-1,0)
+        elif ch == '#':
+            obstacles.add((r,c))
 
-# Part 2
-trylist = []
-for r in range(len(data)):
-    for c in range(len(data[0])):
-        if data[r][c] not in ['^', '#']:
-            trylist += [(r,c)]
+# Part 1, prepararation for part 2.
+guard = Bot(borders, obstacles, start, direction)
+guard.walk()
+#print(guard)
+print(len(guard.thepath()))
+theseen = guard.whatseen()
+thestart = guard.startpoint()
 
-loop = 0
-for place in trylist:
-    if walkthewalk(data, place) == -1:
-        loop += 1
-print(loop)
+# Part 2, only trying to put obstacles where guard walked in part 1.
+tryobstacles = set([p[0] for p in theseen if p[0] != thestart])
+
+loops = 0
+for place in tryobstacles:
+    guard = Bot(borders, obstacles, start, direction)
+    loop, _ = guard.walk(place)
+    if loop:
+#        print(guard)
+        loops += 1
+print(loops)
