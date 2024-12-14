@@ -68,7 +68,8 @@ def pprint(tbots):
     time.sleep(0.1)
 
 def istree(bots):
-    totbots = len(bots)
+    # Well, it is a bit hard to detect a tree. It might be big and dense ...
+    # But when you know, you know ...
     treebot = []
     def nbs(bot):
         (x,y),_ = bot
@@ -77,9 +78,12 @@ def istree(bots):
         return(len(nbsb))
     
     for bot in bots:
-        if nbs(bot) > 4:
+        n = nbs(bot)
+        if n >= 7:
             treebot.append(bot)
-    return(len(treebot) >= totbots/100)
+    score = len(treebot)
+    
+    return(score >= 10)
 
 bots = makebots(data)
 ti = 1000000
@@ -90,6 +94,12 @@ while True:
         tbot = walkbot(bot)
         tbots.append(tbot)
     bots = tbots
+    #if t+1 == 7847:
+    #    pprint(bots)
+    #    input()
+    #pprint(bots)
+    #print(t+1)
+    #input()
     if istree(bots):
         pprint(bots)
         print(t+1)
@@ -101,4 +111,5 @@ while True:
         print('Part 1:', scoring(tbots))
         input('... press enter to continue with part 2 ...')
         print('continuing')
+
     t += 1
