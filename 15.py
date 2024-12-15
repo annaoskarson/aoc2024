@@ -149,20 +149,17 @@ def walk2(s, bot, boxes):
 
 # Part 1
 for w in thewalk:
-    (bot, boxes) = walk(w, bot, boxes)
     #pprint()
+    (bot, boxes) = walk(w, bot, boxes)
 
 pprint()
 score = sum([100 * b[0] + b[1] for b in boxes])
 print('Part 1:', score)
 
 # Part 2
-#pprint2()
-print(bot2)
 for w in thewalk:
-    #print('Move', w)
-    (bot2, boxes2) = walk2(w, bot2, boxes2)
     #pprint2()
+    (bot2, boxes2) = walk2(w, bot2, boxes2)
 pprint2()
 
 score = 0
