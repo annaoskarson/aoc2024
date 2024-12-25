@@ -1,3 +1,13 @@
+def pprint(key,lock):
+    image = '█████\n'
+    for r in range(7):
+        for c in range(5):
+            if lock[c] >= r: image += '█'
+            elif key[c] >= 7-r: image += '▒'
+            else: image += '░'
+        image += '\n'
+    image += '▒▒▒▒▒\n'
+    print(image)
 
 things = [t for t in open('25.txt').read().strip().split('\n\n')]
 
@@ -25,7 +35,7 @@ pairs = set()
 for key in keys:
     for lock in locks:
         if works(key, lock):
+            pprint(key, lock)
             pairs.add((tuple(key.items()), tuple(lock.items())))
             
 print('Part 1:', len(pairs))
-
