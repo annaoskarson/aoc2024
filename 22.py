@@ -58,10 +58,13 @@ for n, secret in enumerate(nums):
 
 print('Part 1:', ans)
 
-sequences = set([ tuple(dif[i:i+4]) for dif in diffs.values() for i,_ in enumerate(dif[:-3]) ])
+sequences = set([ tuple(dif[i+1:i+5]) for dif in diffs.values() for i,_ in enumerate(dif[:-4]) ])
+# We don't need to search in sequences that never show up. Thus, making a set of tuples
+# from the actual diffs.
 
 sell = {}
 for i,sequence in enumerate(sequences):
+    print(i, sequence)
     sell[sequence] = []
 
     for n in range(len(nums)):
