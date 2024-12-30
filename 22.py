@@ -64,7 +64,6 @@ sequences = set([ tuple(dif[i+1:i+5]) for dif in diffs.values() for i,_ in enume
 
 sell = {}
 for i,sequence in enumerate(sequences):
-    print(i, sequence)
     sell[sequence] = []
 
     for n in range(len(nums)):
